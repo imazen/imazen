@@ -139,3 +139,82 @@ text = "Pairwise psychovisual data collection for zensim."
 name = "archmage docs"
 url = "https://imazen.github.io/archmage/"
 text = "Safe SIMD through capability tokens."
+
+# Crates.io crates that the inventory's topics do not carry but this catalog should list.
+# `replaces` drops a topic entry of that name (a repository entry the crate stands for).
+[[add]]
+topic = "HDR & gain maps"
+name = "ultrahdr-rs"
+repository = "imazen/ultrahdr"
+replaces = "ultrahdr"
+[[add]]
+topic = "HDR & gain maps"
+name = "ultrahdr-core"
+repository = "imazen/ultrahdr"
+[[add]]
+topic = "JPEG XL"
+name = "jxl-encoder-cli"
+repository = "imazen/jxl-encoder"
+[[add]]
+topic = "Quality metrics"
+name = "butteraugli-cli"
+repository = "imazen/butteraugli"
+[[add]]
+topic = "Quality metrics"
+name = "zensim-regress"
+repository = "imazen/zensim"
+[[add]]
+topic = "Quality metrics"
+name = "codec-eval"
+repository = "imazen/codec-eval"
+[[add]]
+topic = "Codec API & pipeline"
+name = "zencodec-testkit"
+repository = "imazen/zencodec"
+[[add]]
+topic = "SIMD & Rust foundations"
+name = "almost-enough"
+repository = "imazen/enough"
+[[add]]
+topic = "SIMD & Rust foundations"
+name = "enough-tokio"
+repository = "imazen/enough"
+[[add]]
+topic = "SIMD & Rust foundations"
+name = "enough-ffi"
+repository = "imazen/enough"
+[[add]]
+topic = "SIMD & Rust foundations"
+name = "how-far-along"
+repository = "imazen/how-far"
+[[add]]
+topic = "SIMD & Rust foundations"
+name = "how-far-really"
+repository = "imazen/how-far"
+
+# Crates owned by lilith on crates.io that stay out of the catalog, with the reason.
+# tools/check_crates.py (weekly in CI) fails on any owned crate that is neither listed nor here.
+[unlisted]
+"archmage-macros" = "internal: proc macros used through archmage"
+"jxl-encoder-simd" = "internal: SIMD primitives used through jxl-encoder"
+"zenjxl-decoder-macros" = "internal: used through zenjxl-decoder"
+"zenjxl-decoder-simd" = "internal: used through zenjxl-decoder"
+"zennode-derive" = "internal: derive macros used through zennode"
+"rav1d-disjoint-mut" = "internal: used through rav1d-safe"
+"zenutils-apidoc" = "internal: our API-snapshot test helper"
+"zenutils-fuzz" = "internal: our fuzz-regression runner"
+"mozjpeg-oxide" = "superseded: renamed to mozjpeg-rs"
+"jpegli-rs" = "superseded by zenjpeg"
+"zenpnm" = "superseded by zenbitmaps"
+"butteraugli-oxide" = "superseded: 0.0.0 name reservation; the crate is butteraugli"
+"zenforks-cubecl" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-core" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-cpp" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-cpu" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-cuda" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-hip" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-opt" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-runtime" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-spirv" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-std" = "fork of CubeCL published for our GPU kernels"
+"zenforks-cubecl-wgpu" = "fork of CubeCL published for our GPU kernels"

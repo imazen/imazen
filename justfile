@@ -12,3 +12,7 @@ build:
 # Also write dist/llms-full.txt with every listed README inlined.
 full:
     {{py}} tools/build.py --full
+
+# Fail if crates.io has a crate owned by lilith that the catalog neither lists nor leaves out (needs `just refresh` first).
+check:
+    {{py}} tools/check_crates.py

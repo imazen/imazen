@@ -78,12 +78,14 @@ def entries(d, cat):
     for p in d['projects']:
         for c in p.get('crates') or []:
             crates.setdefault((p['repository'], c['name']), c)
+    adds = cat.get('add', [])
+    replaced = {a['replaces'] for a in adds if a.get('replaces')}
     out = []
     for topic in d['guide']['topics']:
         seen = set()
         for it in topic['items']:
             label, repo = it['label'], it.get('repository')
-            if label in seen or not repo or repo not in proj or proj[repo].get('readme') is False:
+            if label in seen or label in replaced or not repo or repo not in proj or proj[repo].get('readme') is False:
                 continue
             seen.add(label)
             c = crates.get((repo, label))
@@ -93,7 +95,26 @@ def entries(d, cat):
                 'crate_dir': c['id'].split(':')[1] if c else None,
                 'description': (c or {}).get('description') or proj[repo].get('description') or '',
             })
+        for a in adds:
+            if a['topic'] == topic['label'] and a['name'] not in seen:
+                seen.add(a['name'])
+                out.append({'topic': a['topic'], 'name': a['name'], 'repository': a['repository'], 'parent': None,
+                            'kind': 'crate', 'crate_dir': a.get('crate_dir'), 'description': ''})
     return out
+
+
+def owned_crates(user='lilith'):
+    """Every crate.io crate the user owns, by name."""
+    uid = get(f'https://crates.io/api/v1/users/{user}')['user']['id']
+    out, page = {}, 1
+    while True:
+        d = get(f'https://crates.io/api/v1/crates?user_id={uid}&per_page=100&page={page}&sort=alpha')
+        for c in d['crates']:
+            out[c['name']] = c
+        if len(d['crates']) < 100:
+            return out
+        page += 1
+        time.sleep(1)  # crates.io asks for at most one request a second
 
 
 # ---------- registry facts ----------
@@ -137,7 +158,8 @@ def refresh(cat):
                    | {b['repo'] for p in cat['product'] for b in p.get('bindings', [])})
     reg = {'fetched_at': datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds'),
            'how': 'python3 tools/build.py --refresh: GET https://api.github.com/repos/<repo>, '
-                  '.../releases/latest, https://crates.io/api/v1/crates/<crate>, and raw Cargo.toml for unpublished crates',
+                  '.../releases/latest, .../readme[/<dir>], https://crates.io/api/v1/crates?user_id=<lilith> (published means '
+                  'owned by lilith on crates.io), https://crates.io/api/v1/crates/<crate>, and raw Cargo.toml for unpublished crates',
            'repositories': {}, 'crates': {}}
     for repo in repos:
         r = get(f'https://api.github.com/repos/{repo}', token)
@@ -151,21 +173,22 @@ def refresh(cat):
             'license': (r.get('license') or {}).get('spdx_id'),
             'latest_release': {'tag': rel['tag_name'], 'published_at': rel['published_at'][:10]} if rel else None,
         }
+    owned = owned_crates()
+    reg['owner'] = 'lilith'
     for e in ents:
         if e['kind'] != 'crate' or e['name'] in reg['crates']:
             continue
-        time.sleep(1)  # crates.io asks for at most one request a second
-        c = get(f"https://crates.io/api/v1/crates/{e['name']}")
-        owned = c and (c['crate'].get('repository') or '').rstrip('/').removesuffix('.git').lower().endswith(e['repository'].lower())
-        if owned:
+        if e['name'] in owned:
+            time.sleep(1)  # crates.io asks for at most one request a second
+            c = get(f"https://crates.io/api/v1/crates/{e['name']}")
             cr = c['crate']
             ver = next((v for v in c['versions'] if v['num'] == cr['max_version']), c['versions'][0])
             reg['crates'][e['name']] = {
                 'published': True, 'version': cr['max_stable_version'] or cr['max_version'], 'max_version': cr['max_version'],
-                'license': ver.get('license'), 'rust_version': ver.get('rust_version'),
+                'license': ver.get('license'), 'rust_version': ver.get('rust_version'), 'description': cr.get('description'),
                 'downloads': cr['downloads'], 'recent_downloads': cr.get('recent_downloads'),
                 'first_published': cr['created_at'][:10], 'updated': cr['updated_at'][:10],
-                'documentation': cr.get('documentation') or f"https://docs.rs/{e['name']}",
+                'repository': cr.get('repository'), 'documentation': cr.get('documentation') or f"https://docs.rs/{e['name']}",
             }
         else:
             branch = reg['repositories'].get(e['repository'], {}).get('default_branch', 'main')
@@ -198,6 +221,9 @@ class Ctx:
         self.d, self.reg, self.cat = d, reg, cat
         self.ents = [e for e in entries(d, cat)
                      if not reg['repositories'].get(e['repository'], {}).get('private', False)]
+        for e in self.ents:
+            if not e['description']:
+                e['description'] = reg['crates'].get(e['name'], {}).get('description') or ''
         self.by_name = {}
         for e in self.ents:
             self.by_name.setdefault(e['name'], e)
@@ -466,7 +492,8 @@ def readme(x):
     L += ['## About this repository', '',
           '`python3 tools/build.py --refresh` regenerates README.md and llms.txt from the public inventory behind '
           f"the research dashboard ({STATS_URL}), crates.io and GitHub, plus the hand-written [catalog.toml](catalog.toml). "
-          'Standard library only. Corrections are welcome as issues or pull requests against catalog.toml.', '',
+          'Standard library only. A weekly workflow refreshes both files and fails when crates.io lists a crate we own that '
+          'the catalog neither lists nor leaves out on purpose. Corrections are welcome as issues or pull requests against catalog.toml.', '',
           f"*Generated from inventory revision {d['revision'][:12]} ({x.asof}) and registry facts fetched {x.reg_asof}.*", '']
     return '\n'.join(L)
 

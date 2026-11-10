@@ -1,0 +1,69 @@
+# Weekly: refresh README.md and llms.txt from the inventory, crates.io and GitHub, commit them when they
+# change, then fail if crates.io has a crate owned by lilith that the catalog neither lists nor leaves out
+# on purpose (catalog.toml [unlisted]). A failure opens or updates an issue assigned to lilith; GitHub also
+# emails the failed scheduled run to the account that last changed this file's schedule.
+name: Weekly refresh and crate check
+
+on:
+  schedule:
+    - cron: '17 14 * * 1'  # Mondays, 14:17 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [catalog.toml, 'tools/**', .github/workflows/weekly.yml]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: weekly
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+
+      - name: Rebuild README.md and llms.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 tools/build.py --refresh
+
+      - name: Commit README.md and llms.txt if they changed
+        run: |
+          git config user.name 'Lilith River'
+          git config user.email 'lilith@imazen.io'
+          git add README.md llms.txt
+          if git diff --cached --quiet; then
+            echo 'No changes.'
+          else
+            git commit -m 'docs: weekly refresh of README.md and llms.txt' \
+              -m "Rebuilt by the weekly workflow (run ${{ github.run_id }}) from the stats inventory, crates.io and GitHub."
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Check for crates the catalog does not list
+        id: check
+        run: python3 tools/check_crates.py --report new-crates.md
+
+      - name: Open or update the new-crates issue
+        if: failure() && steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh label create new-crates --color d93f0b --description 'crates.io crates the catalog does not list' 2>/dev/null || true
+          body="$(cat new-crates.md)"$'\n\n'"Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          num=$(gh issue list --label new-crates --state open --json number --jq '.[0].number')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body "$body"
+          else
+            gh issue create --title 'New crates on crates.io that the catalog does not list' \
+              --label new-crates --assignee lilith --body "$body"
+          fi
