@@ -1,0 +1,141 @@
+# Hand-written half of the catalog. tools/build.py merges it with the public project data behind
+# https://stats.lilith.now/data.json and with registry facts in data/registry.json (crates.io and GitHub,
+# fetched by `python3 tools/build.py --refresh`). Everything a registry can answer comes from the registry;
+# this file holds only judgment: what each topic is for, which entry to start with, and how to integrate.
+
+# Topics from the stats data that go to the llms.txt "Optional" section and the end of the README.
+secondary_topics = ["Test corpora", "Developer tools", "Other tools", "Earlier work"]
+
+[org]
+name = "Imazen"
+site = "https://www.imazen.io/"
+pricing = "https://www.imazen.io/pricing"
+licensing = "https://www.imazen.io/legal"
+support = "support@imazen.io"
+sales = "sales@imazen.io"
+github = "https://github.com/imazen"
+# The live dashboard of the work. Becomes https://research.imazen.io/ when that site is published.
+research = "https://stats.lilith.now/"
+repo = "imazen/imazen"
+
+# Products are written here rather than taken from the topic list: they are what most visitors came for.
+[[product]]
+name = "Imageflow Server"
+repo = "imazen/imageflow-server"
+what = "An image server for .NET: resize, crop, convert and optimize images on the fly from URL commands, with caching and request signing. Runs as a microservice, serverless, or inside an ASP.NET app."
+use_when = "You want images processed on request, close to your existing .NET stack."
+
+[[product]]
+name = "Imageflow"
+repo = "imazen/imageflow"
+what = "The image processing engine (Rust, with a C API) behind Imageflow Server, plus imageflow_tool for the command line."
+use_when = "You process images ahead of time, in batch jobs, or from another language through the bindings."
+bindings = [
+  { name = ".NET", repo = "imazen/imageflow-dotnet" },
+  { name = "Node", repo = "imazen/imageflow-node" },
+  { name = "Go", repo = "imazen/imageflow-go" },
+]
+
+[[product]]
+name = "ImageResizer"
+repo = "imazen/resizer"
+what = "The long-running .NET image server and library that many ASP.NET sites still depend on."
+use_when = "You maintain an existing ImageResizer deployment."
+license = "Apache-2.0 for most plugins; the rest AGPL-3.0 or commercial (see the repository's LICENSE.md)"
+
+# What each topic covers, and the entry to start with. `start` names an entry in that topic.
+[topic."JPEG"]
+note = "Encoders, decoder and YUV conversion, in safe Rust."
+start = "zenjpeg"
+[topic."WebP"]
+note = "Lossy and lossless WebP, plus libwebp bindings."
+start = "zenwebp"
+[topic."AVIF & AV1"]
+note = "The AVIF container, three AV1 encoders and a decoder."
+start = "zenavif"
+[topic."JPEG XL"]
+note = "Encoder, decoder, GPU kernels and an inspector."
+start = "jxl-encoder"
+[topic."PNG & GIF"]
+note = "PNG and animated GIF."
+start = "zenpng"
+[topic."HDR & gain maps"]
+note = "Ultra HDR gain maps and tone mapping."
+start = "zentone"
+[topic."Learned codecs"]
+note = "JPEG AI and Cool-chic, ported to safe Rust. Unreleased."
+start = "zenjpegai"
+[topic."HEIC, RAW & more formats"]
+note = "HEIC, camera RAW, TIFF, PDF, SVG, JPEG 2000 and bitmaps."
+start = "heic"
+[topic."Codec API & pipeline"]
+note = "The shared codec traits and the streaming pipeline that ties the codecs together."
+start = "zencodec"
+[topic."Processing"]
+note = "Resize, filter, blend, quantize, crop and enhance."
+start = "zenresize"
+[topic."Pixels & color"]
+note = "Pixel formats, transfer functions and color conversion."
+start = "zenpixels"
+[topic."Compression"]
+note = "DEFLATE, Zopfli, Zstandard and xxHash."
+start = "zenflate"
+[topic."Quality metrics"]
+note = "Perceptual quality metrics, used to tune the codecs."
+start = "zensim"
+[topic."Codec pickers"]
+note = "Choose the codec and quality for each image."
+start = "zenpredict"
+[topic."SIMD & Rust foundations"]
+note = "Safe SIMD, cooperative cancellation, error tracing and benchmarking."
+start = "archmage"
+[topic."Test corpora"]
+note = "Images to test and train on."
+[topic."Developer tools"]
+note = "Workspace, release and API tooling."
+[topic."Products"]
+note = "Image servers and their bindings."
+[topic."Other tools"]
+note = "Everything else in use."
+[topic."Earlier work"]
+note = "The .NET and C years."
+
+# Owner statements (2026-11-09), shown hedged. Each names a public entry; claims about unpublished
+# repositories wait until the code is public.
+[[first]]
+text = "JPEG XL encoder in Rust"
+entry = "jxl-encoder"
+[[first]]
+text = "full WebP codec in Rust (lossy and lossless, encode and decode)"
+entry = "zenwebp"
+[[first]]
+text = "JPEG AI codec in Rust"
+entry = "zenjpegai"
+[[first]]
+text = "SVT-AV1 encoder ported to Rust"
+entry = "zenav1-svt"
+
+[[demo]]
+name = "IMI"
+url = "https://gigapixels.imazen.org/"
+text = "Earth and deep-space imagery in IMI, Imazen's own image format for fast, independently addressable decoding. The format is not frozen yet."
+[[demo]]
+name = "JPEG AI in the browser"
+url = "https://jpegai.imazen.org/"
+text = "zenjpegai, the JPEG AI codec, running in the browser."
+[[demo]]
+name = "Metrics"
+url = "https://metrics.imazen.org/"
+text = "Compare images under the metrics in zenmetrics."
+[[demo]]
+name = "Metric cost"
+url = "https://metric-brief.imazen.org/#models"
+text = "What each of the ported image-quality metrics costs to run."
+[[demo]]
+name = "squintly"
+url = "https://squintly.imazen.org/"
+text = "Pairwise psychovisual data collection for zensim."
+[[demo]]
+name = "archmage docs"
+url = "https://imazen.github.io/archmage/"
+text = "Safe SIMD through capability tokens."

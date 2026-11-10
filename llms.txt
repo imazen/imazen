@@ -1,0 +1,210 @@
+# Imazen
+
+> Imazen builds image codecs, image processing and image servers. The current work is an imaging stack in safe Rust: encoders and decoders for JPEG, WebP, AVIF/AV1, JPEG XL, PNG, GIF, HEIC and more, plus resizing, color, compositing, quality metrics and a streaming pipeline. Imageflow, Imageflow Server and ImageResizer are the products built on this work.
+
+How to use this file:
+
+- Each entry links to a Markdown README. Crates also list their crates.io version, license and docs.rs page; read the docs for the exact API of the version you install, and do not call an API from memory.
+- To serve images on request from a .NET stack, use Imageflow Server. To process images in batch or from Node, Go or .NET code, use Imageflow and its bindings. To encode or decode inside a Rust program, depend on the codec crate for each format (the "start with" entry of each topic below).
+- Licensing: many codec and processing crates are `AGPL-3.0-only OR LicenseRef-Imazen-Commercial`. Under the AGPL, software that uses them over a network must offer its source; otherwise buy a commercial license at https://www.imazen.io/pricing (a $1 key for open-source projects and for companies with fewer than 5 employees and under $1M revenue). Shared APIs, pixel types, SIMD and utility crates are permissive, and some ports keep their upstream license. Check each entry's license field.
+- Images from untrusted sources: the codecs take resource limits (dimensions, pixels, memory) and cooperative cancellation. Set them for any input you did not produce.
+- "Unreleased" entries have source on GitHub but no crates.io release; their APIs change without notice.
+- Questions: support@imazen.io. Licensing: sales@imazen.io.
+
+## Products
+
+- [Imageflow Server](https://raw.githubusercontent.com/imazen/imageflow-server/main/README.md): An image server for .NET: resize, crop, convert and optimize images on the fly from URL commands, with caching and request signing. Runs as a microservice, serverless, or inside an ASP.NET app. Use it when you want images processed on request, close to your existing .NET stack. License: AGPL-3.0 or commercial; latest release v0.9.0 (2025-07-04). Source: https://github.com/imazen/imageflow-server
+- [Imageflow](https://raw.githubusercontent.com/imazen/imageflow/main/README.md): The image processing engine (Rust, with a C API) behind Imageflow Server, plus imageflow_tool for the command line. Use it when you process images ahead of time, in batch jobs, or from another language through the bindings. License: AGPL-3.0 or commercial; latest release v2.3.1-rc01 (2026-03-31). Source: https://github.com/imazen/imageflow
+- [Imageflow for .NET](https://raw.githubusercontent.com/imazen/imageflow-dotnet/main/README.md): The official .NET API for Imageflow, the Rust image processing and optimization engine for web servers. License: AGPL-3.0 or commercial. Source: https://github.com/imazen/imageflow-dotnet
+- [Imageflow for Node](https://raw.githubusercontent.com/imazen/imageflow-node/main/README.md): An Image manipulation Library for Nodejs. Based on https://github.com/imazen/imageflow. License: AGPL-3.0 or commercial. Source: https://github.com/imazen/imageflow-node
+- [Imageflow for Go](https://raw.githubusercontent.com/imazen/imageflow-go/main/README.md): Go bindings for Imageflow -> https://github.com/imazen/imageflow. License: AGPL-3.0 or commercial. Source: https://github.com/imazen/imageflow-go
+- [ImageResizer](https://raw.githubusercontent.com/imazen/resizer/develop/README.md): The long-running .NET image server and library that many ASP.NET sites still depend on. Use it when you maintain an existing ImageResizer deployment. License: Apache-2.0 for most plugins; the rest AGPL-3.0 or commercial (see the repository's LICENSE.md); latest release v5.1.0-rc01 (2025-06-26). Source: https://github.com/imazen/resizer
+
+## JPEG
+
+Encoders, decoder and YUV conversion, in safe Rust. Start with zenjpeg.
+
+- [zenjpeg](https://raw.githubusercontent.com/imazen/zenjpeg/main/zenjpeg/README.md): Pure Rust JPEG encoder/decoder with perceptual optimizations. crates.io 0.8.4; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenjpeg; source https://github.com/imazen/zenjpeg
+- [zenyuv](https://raw.githubusercontent.com/imazen/zenjpeg/main/zenyuv/README.md): SIMD-optimized YUV↔RGB color matrix conversion (BT.601/709/2020). crates.io 0.1.3; license MIT OR Apache-2.0; docs https://docs.rs/zenyuv; source https://github.com/imazen/zenjpeg
+- [mozjpeg-rs](https://raw.githubusercontent.com/imazen/mozjpeg-rs/main/README.md): Pure Rust JPEG encoder based on Mozilla's mozjpeg with trellis quantization. crates.io 0.9.2; license BSD-3-Clause; docs https://docs.rs/mozjpeg-rs; source https://github.com/imazen/mozjpeg-rs
+- [browser-jpeg-support](https://github.com/lilith/browser-jpeg-support): Browser compatibility test for JPEG SOF markers (baseline, progressive, arithmetic, 12-bit, extended sequential). source on GitHub; license not declared; source https://github.com/lilith/browser-jpeg-support
+
+## WebP
+
+Lossy and lossless WebP, plus libwebp bindings. Start with zenwebp.
+
+- [zenwebp](https://raw.githubusercontent.com/imazen/zenwebp/main/README.md): High-performance WebP encoding and decoding in pure Rust. crates.io 0.4.6; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenwebp; source https://github.com/imazen/zenwebp
+- [webpx](https://raw.githubusercontent.com/imazen/webpx/main/README.md): WebP encode/decode via libwebp (FFI). New projects: use zenwebp, the pure-Rust WebP codec with the same zencodec API. crates.io 0.4.1; license MIT OR Apache-2.0; docs https://docs.rs/webpx; source https://github.com/imazen/webpx
+- [libwebp-net](https://raw.githubusercontent.com/imazen/libwebp-net/main/README.md): A .NET wrapper for libwebp (and binaries thereof). release v11.0.0 (2026-02-27); license MIT; source https://github.com/imazen/libwebp-net
+
+## AVIF & AV1
+
+The AVIF container, three AV1 encoders and a decoder. Start with zenavif.
+
+- [zenavif](https://raw.githubusercontent.com/imazen/zenavif/main/README.md): Pure Rust AVIF image codec powered by rav1d and zenravif. crates.io 0.1.6; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenavif; source https://github.com/imazen/zenavif
+- [zenavif-parse](https://raw.githubusercontent.com/imazen/zenavif/main/zenavif-parse/README.md): AVIF container parser with zero-copy AvifParser API, grid images, animation, and resource limits. Fork of avif-parse. unreleased (source on GitHub); license MPL-2.0; source https://github.com/imazen/zenavif
+- [zenavif-serialize](https://raw.githubusercontent.com/imazen/zenavif/main/zenavif-serialize/README.md): AVIF container serializer (MPEG/HEIF/MIAF/ISO-BMFF) with animation and grid support. unreleased (source on GitHub); license BSD-3-Clause; source https://github.com/imazen/zenavif
+- [zenravif](https://raw.githubusercontent.com/imazen/cavif-rs/main/ravif/README.md): Pure Rust AVIF encoder wrapping zenrav1e with still image, animation, HDR, and metadata support. crates.io 0.1.3; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenravif; source https://github.com/imazen/cavif-rs
+- [zenrav1e](https://raw.githubusercontent.com/imazen/zenrav1e/master/README.md): AV1 encoder optimized for still and animated AVIF images (Imazen fork of rav1e). crates.io 0.1.4; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenrav1e; source https://github.com/imazen/zenrav1e
+- [rav1d-safe](https://raw.githubusercontent.com/imazen/rav1d-safe/main/README.md): Safe SIMD fork of rav1d - Rust AV1 decoder with archmage intrinsics. crates.io 0.6.0; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/rav1d-safe; source https://github.com/imazen/rav1d-safe
+- [zenav1-svt](https://raw.githubusercontent.com/imazen/zenav1-svt/main/README.md): Safe Rust AV1 encoder — algorithm-for-algorithm port of SVT-AV1. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenav1-svt
+- [zenav1-aom](https://raw.githubusercontent.com/imazen/zenav1-aom/main/crates/zenav1-aom/README.md): Pure-Rust, bit-exact libaom v3.14.1 AV1 codec — thin facade re-exporting the DSP kernels plus the (feature-gated) decoder and encoder as one dependency. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenav1-aom
+
+## JPEG XL
+
+Encoder, decoder, GPU kernels and an inspector. Start with jxl-encoder.
+
+- [zenjxl](https://raw.githubusercontent.com/imazen/zenjxl/main/README.md): JPEG XL encoding and decoding with zencodec trait integration. crates.io 0.2.1; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenjxl; source https://github.com/imazen/zenjxl
+- [zenjxl-decoder](https://raw.githubusercontent.com/imazen/zenjxl-decoder/main/README.md): High performance Rust implementation of a JPEG XL decoder. crates.io 0.3.10; license BSD-3-Clause; docs https://docs.rs/zenjxl-decoder; source https://github.com/imazen/zenjxl-decoder
+- [jxl-encoder](https://raw.githubusercontent.com/imazen/jxl-encoder/main/README.md): JPEG XL encoder in pure Rust. crates.io 0.3.4; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/jxl-encoder; source https://github.com/imazen/jxl-encoder
+- [jxl-gpu](https://raw.githubusercontent.com/imazen/jxl-gpu/main/README.md): Multi-vendor GPU kernels for JPEG XL encoding via CubeCL (CUDA/WGPU/HIP/CPU). Mirrors jxl-encoder-simd 1:1 with sub-ulp parity targets. source on GitHub; license AGPL-3.0; source https://github.com/imazen/jxl-gpu
+- [jxl-inspect](https://raw.githubusercontent.com/imazen/jxl-inspect/main/README.md): JXL bitstream inspection and analysis tool for JPEG XL debugging. unreleased (source on GitHub); license MIT OR Apache-2.0; source https://github.com/imazen/jxl-inspect
+
+## PNG & GIF
+
+PNG and animated GIF. Start with zenpng.
+
+- [zenpng](https://raw.githubusercontent.com/imazen/zenpng/main/README.md): PNG encoding and decoding with zencodec trait integration. crates.io 0.1.4; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenpng; source https://github.com/imazen/zenpng
+- [zengif](https://raw.githubusercontent.com/imazen/zengif/main/README.md): Server-side GIF codec with zero-trust design, memory bounds, streaming, and full animation transparency support. crates.io 0.7.3; license MIT OR Apache-2.0; docs https://docs.rs/zengif; source https://github.com/imazen/zengif
+
+## HDR & gain maps
+
+Ultra HDR gain maps and tone mapping. Start with zentone.
+
+- [ultrahdr](https://raw.githubusercontent.com/imazen/ultrahdr/main/README.md): Pure Rust Ultra HDR (gain map HDR) encoder/decoder. release ultrahdr-rs-v0.4.1 (2026-07-24); license Apache-2.0; source https://github.com/imazen/ultrahdr
+- [zentone](https://raw.githubusercontent.com/imazen/zentone/main/README.md): HDR to SDR tone mapping curves: Hable, Narkowicz, ACES, AgX, Möbius (libplacebo), ITU BT.2408 / BT.2446-B / BT.2446-C, darktable filmic spline, plus an ISO 21496-1 / Ultra HDR gain-map splitter and experimental adaptive/streaming tonemappers. crates.io 0.1.0; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zentone; source https://github.com/imazen/zentone
+- [gainmap-spec-status](https://raw.githubusercontent.com/imazen/gainmap-spec-status/main/README.md): Cross-codec gain map (ISO 21496-1) spec status + zen crate compliance audit. source on GitHub; license not declared; source https://github.com/imazen/gainmap-spec-status
+- [browser-hdr-test](https://raw.githubusercontent.com/lilith/browser-hdr-test/main/README.md): Test browser HDR headroom and wide gamut support. source on GitHub; license not declared; source https://github.com/lilith/browser-hdr-test
+
+## Learned codecs
+
+JPEG AI and Cool-chic, ported to safe Rust. Unreleased. Start with zenjpegai.
+
+- [zenjpegai](https://raw.githubusercontent.com/imazen/zenjpegai/main/README.md): JPEG AI (ISO/IEC 6048-1 | ITU-T T.840.1) learned image codec in safe Rust — a port of the JPEG AI reference software. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenjpegai
+- [zencoolchic](https://raw.githubusercontent.com/imazen/zencoolchic/main/README.md): Cool-chic 5 overfitted neural image codec in safe Rust. unreleased (source on GitHub); license BSD-3-Clause; source https://github.com/imazen/zencoolchic
+
+## HEIC, RAW & more formats
+
+HEIC, camera RAW, TIFF, PDF, SVG, JPEG 2000 and bitmaps. Start with heic.
+
+- [heic](https://raw.githubusercontent.com/imazen/heic/main/README.md): Pure Rust HEIC/HEIF image decoder with SIMD acceleration. crates.io 0.1.6; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/heic; source https://github.com/imazen/heic
+- [zenraw](https://raw.githubusercontent.com/imazen/zenraw/main/README.md): Camera RAW and DNG decoder with zenpixels integration. crates.io 0.2.0; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenraw; source https://github.com/imazen/zenraw
+- [zenbitmaps](https://raw.githubusercontent.com/imazen/zenbitmaps/main/README.md): PNM/PAM/PFM, BMP, farbfeld, QOI, TGA, and Radiance HDR image codec. crates.io 0.1.5; license MIT OR Apache-2.0; docs https://docs.rs/zenbitmaps; source https://github.com/imazen/zenbitmaps
+- [zentiff](https://raw.githubusercontent.com/imazen/zenextras/main/zentiff/README.md): TIFF decoding and encoding wrapper with zenpixels integration. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenextras
+- [zenpdf](https://raw.githubusercontent.com/imazen/zenextras/main/zenpdf/README.md): PDF page renderer via hayro with page selection and render bounds. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenextras
+- [zensvg](https://raw.githubusercontent.com/imazen/zenextras/main/zensvg/README.md): SVG rendering and lossless optimization with zencodec integration. unreleased (source on GitHub); license Apache-2.0 OR MIT; source https://github.com/imazen/zenextras
+- [zenjp2](https://raw.githubusercontent.com/imazen/zenextras/main/zenjp2/README.md): JPEG 2000 decoder for the zen codec ecosystem, wrapping hayro-jpeg2000. unreleased (source on GitHub); license Apache-2.0 OR MIT; source https://github.com/imazen/zenextras
+
+## Codec API & pipeline
+
+The shared codec traits and the streaming pipeline that ties the codecs together. Start with zencodec.
+
+- [zencodec](https://raw.githubusercontent.com/imazen/zencodec/main/README.md): Shared traits and types for zen* image codecs. crates.io 0.1.26; license Apache-2.0 OR MIT; docs https://docs.rs/zencodec; source https://github.com/imazen/zencodec
+- [zencodecs](https://raw.githubusercontent.com/imazen/zenpipe/main/zencodecs/README.md): Unified image codec dispatch over the zen codecs (JPEG, PNG, WebP, GIF, AVIF, JXL, TIFF, RAW, and more). unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenpipe
+- [zenpipe](https://raw.githubusercontent.com/imazen/zenpipe/main/README.md): Streaming pixel pipeline — zero-materialization graph execution over zen crates. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenpipe
+- [zenlayout](https://raw.githubusercontent.com/imazen/zenpipe/main/zenlayout/README.md): Image layout computation with constraint modes, orientation, and decoder negotiation. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenpipe
+- [zennode](https://raw.githubusercontent.com/imazen/zennode/main/README.md): Self-documenting node definitions for image processing pipelines. crates.io 0.1.1; license Apache-2.0 OR MIT; docs https://docs.rs/zennode; source https://github.com/imazen/zennode
+- [zenwasm](https://raw.githubusercontent.com/imazen/zenwasm/main/README.md): WASM build targets and bindings for zen* codecs. source on GitHub; license AGPL-3.0; source https://github.com/imazen/zenwasm
+- [zentract](https://raw.githubusercontent.com/imazen/zentract/main/README.md): ONNX model inference via tract for zen* ecosystem. source on GitHub; license AGPL-3.0; source https://github.com/imazen/zentract
+
+## Processing
+
+Resize, filter, blend, quantize, crop and enhance. Start with zenresize.
+
+- [zenresize](https://raw.githubusercontent.com/imazen/zenresize/main/README.md): High-quality image resampling with 31 filters, streaming API, and SIMD acceleration. crates.io 0.3.1; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenresize; source https://github.com/imazen/zenresize
+- [zenfilters](https://raw.githubusercontent.com/imazen/zenpipe/main/zenfilters/README.md): Photo filter operations on planar Oklab f32 data with SIMD acceleration. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenpipe
+- [zenblend](https://raw.githubusercontent.com/imazen/zenblend/main/README.md): Porter-Duff and artistic blend modes on premultiplied linear f32 RGBA rows. SIMD-accelerated. crates.io 0.1.3; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenblend; source https://github.com/imazen/zenblend
+- [zenquant](https://raw.githubusercontent.com/imazen/zenquant/main/README.md): AQ-informed palette quantizer — perceptual masking meets color quantization. crates.io 0.1.3; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenquant; source https://github.com/imazen/zenquant
+- [zensally](https://raw.githubusercontent.com/imazen/zensally/main/README.md): Fast pure-Rust face detection and saliency for smart image cropping. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zensally
+- [zensr](https://raw.githubusercontent.com/imazen/zensr/main/README.md): CPU super-resolution and JPEG artifact repair for web images — measured, falsification-driven research (pre-0.1). source on GitHub; license AGPL-3.0; source https://github.com/imazen/zensr
+
+## Pixels & color
+
+Pixel formats, transfer functions and color conversion. Start with zenpixels.
+
+- [zenpixels](https://raw.githubusercontent.com/imazen/zenpixels/main/README.md): Pixel format interchange types for zen* codecs. crates.io 0.2.16; license Apache-2.0 OR MIT; docs https://docs.rs/zenpixels; source https://github.com/imazen/zenpixels
+- [zenpixels-convert](https://raw.githubusercontent.com/imazen/zenpixels/main/zenpixels-convert/README.md): Transfer-function-aware pixel conversion, gamut mapping, and codec format negotiation for zenpixels. crates.io 0.2.16; license Apache-2.0 OR MIT; docs https://docs.rs/zenpixels-convert; source https://github.com/imazen/zenpixels
+- [linear-srgb](https://raw.githubusercontent.com/imazen/linear-srgb/main/README.md): Fast linear↔sRGB color space conversion with FMA acceleration and LUT support. crates.io 0.6.12; license MIT OR Apache-2.0; docs https://docs.rs/linear-srgb; source https://github.com/imazen/linear-srgb
+- [garb](https://raw.githubusercontent.com/imazen/garb/main/README.md): Dress your pixels for the occasion — SIMD-optimized pixel format conversions. crates.io 0.2.8; license MIT OR Apache-2.0; docs https://docs.rs/garb; source https://github.com/imazen/garb
+
+## Compression
+
+DEFLATE, Zopfli, Zstandard and xxHash. Start with zenflate.
+
+- [zenflate](https://raw.githubusercontent.com/imazen/zenflate/main/README.md): Pure Rust DEFLATE/zlib/gzip compression and decompression. crates.io 0.4.1; license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; docs https://docs.rs/zenflate; source https://github.com/imazen/zenflate
+- [zenzop](https://raw.githubusercontent.com/imazen/zenzop/main/README.md): A faster fork of the Zopfli DEFLATE compressor with optional ECT-derived optimizations. crates.io 0.4.2; license Apache-2.0; docs https://docs.rs/zenzop; source https://github.com/imazen/zenzop
+- [zenzstd](https://raw.githubusercontent.com/imazen/zenzstd/main/README.md): Pure Rust Zstandard (zstd) compression and decompression — forbid(unsafe_code), no_std+alloc. unreleased (source on GitHub); license MIT; source https://github.com/imazen/zenzstd
+- [zenhash](https://raw.githubusercontent.com/imazen/zenhash/main/README.md): XxHash (XXH3, XXH32, XXH64) in safe Rust with runtime SIMD dispatch. unreleased (source on GitHub); license MIT OR Apache-2.0; source https://github.com/imazen/zenhash
+
+## Quality metrics
+
+Perceptual quality metrics, used to tune the codecs. Start with zensim.
+
+- [zensim](https://raw.githubusercontent.com/imazen/zensim/main/README.md): Fast psychovisual image similarity metric. crates.io 0.2.7; license MIT OR Apache-2.0; docs https://docs.rs/zensim; source https://github.com/imazen/zensim
+- [fast-ssim2](https://raw.githubusercontent.com/imazen/fast-ssim2/main/fast-ssim2/README.md): Fast SSIMULACRA2 image quality metric with SIMD acceleration. crates.io 0.9.1; license BSD-2-Clause AND BSD-3-Clause AND MIT; docs https://docs.rs/fast-ssim2; source https://github.com/imazen/fast-ssim2
+- [butteraugli](https://raw.githubusercontent.com/imazen/butteraugli/main/README.md): Pure Rust implementation of the Butteraugli perceptual image quality metric (Jyrki Alakuijala) from libjxl. crates.io 0.9.3; license BSD-3-Clause; docs https://docs.rs/butteraugli; source https://github.com/imazen/butteraugli
+- [zenmetrics](https://raw.githubusercontent.com/imazen/zenmetrics/master/README.md): Most IQA metrics, in optimized cross-platform Rust 🚧 Will be reorganized soon. source on GitHub; license AGPL-3.0; source https://github.com/imazen/zenmetrics
+- [resamplescope-rs](https://raw.githubusercontent.com/imazen/resamplescope-rs/main/README.md): Validate, compare, and plot the resampling filters/kernels used by any image resizer. crates.io 0.1.0; license AGPL-3.0-or-later; docs https://docs.rs/resamplescope-rs; source https://github.com/imazen/resamplescope-rs
+- [squintly](https://raw.githubusercontent.com/imazen/squintly/main/README.md): Browser-based psychovisual data collection for zensim — pairwise quality judgments across recorded viewing conditions. unreleased (source on GitHub); license Apache-2.0 OR MIT; source https://github.com/imazen/squintly
+- [evif](https://raw.githubusercontent.com/imazen/evif/main/README.md): EVIF, the evil image format: a self-reporting container for image-quality-metric stress tests. unreleased (source on GitHub); license MIT OR Apache-2.0; source https://github.com/imazen/evif
+
+## Codec pickers
+
+Choose the codec and quality for each image. Start with zenpredict.
+
+- [zenanalyze](https://raw.githubusercontent.com/imazen/zenanalyze/main/README.md): Image content analyzers (variance, edges, chroma sharpness, DCT energy, derived likelihoods) for adaptive codec decisions. Pulls rows on demand from any zenpixels PixelSlice. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenanalyze
+- [zenpredict](https://raw.githubusercontent.com/imazen/zenanalyze/main/zenpredict/README.md): Zero-copy MLP runtime: parse a packed binary model (ZNPR v3), run scaler + forward pass, surface typed metadata, run masked argmin for codec-config selection. Core of zenjpeg/zenwebp/zenavif/zenjxl picker selection and zensim perceptual distance. Bake-side composer lives in the sibling `zenpredict-bake` crate. crates.io 0.2.0; license MIT OR Apache-2.0; docs https://docs.rs/zenpredict; source https://github.com/imazen/zenanalyze
+- [zenpicker](https://raw.githubusercontent.com/imazen/zenanalyze/main/zenpicker/README.md): Codec-family meta-picker. Given image features + a quality target + an allowed-family mask, picks one of {jpeg, webp, jxl, avif, png, gif}; per-codec pickers handle config selection within the chosen family. Loads a baked ZNPR v3 model via zenpredict. unreleased (source on GitHub); license AGPL-3.0-only OR LicenseRef-Imazen-Commercial; source https://github.com/imazen/zenanalyze
+- [zenanalyze-api](https://raw.githubusercontent.com/imazen/zenanalyze/main/zenanalyze-api/README.md): Version-unifying feature contract for the zenanalyze picker tree: Request (what a codec wants) + Offer (a self-describing feature result) so a dozen codecs on different zenanalyze/zenpredict versions can share one extraction pass. Pure transport — no feature definitions. crates.io 0.1.0; license MIT OR Apache-2.0; docs https://docs.rs/zenanalyze-api; source https://github.com/imazen/zenanalyze
+
+## SIMD & Rust foundations
+
+Safe SIMD, cooperative cancellation, error tracing and benchmarking. Start with archmage.
+
+- [archmage](https://raw.githubusercontent.com/imazen/archmage/main/README.md): Safely invoke your intrinsic power, using the tokens granted to you by the CPU. Cast primitive magics faster than any mage alive. crates.io 0.9.31; license MIT OR Apache-2.0; docs https://docs.rs/archmage; source https://github.com/imazen/archmage
+- [magetypes](https://raw.githubusercontent.com/imazen/archmage/main/magetypes/README.md): Token-gated SIMD types with natural operators. Depends on archmage for tokens. crates.io 0.9.31; license MIT OR Apache-2.0; docs https://docs.rs/magetypes; source https://github.com/imazen/archmage
+- [multiversed](https://raw.githubusercontent.com/imazen/multiversed/main/README.md): Attribute macros wrapping multiversion with predefined SIMD target presets. crates.io 0.3.1; license MIT OR Apache-2.0; docs https://docs.rs/multiversed; source https://github.com/imazen/multiversed
+- [winarm-cpufeatures](https://raw.githubusercontent.com/imazen/winarm-cpufeatures/main/README.md): AArch64 feature detection that fills the Windows-on-ARM gap in std::arch::is_aarch64_feature_detected!. Wires every PF_ARM_* constant from Windows SDK 26100; an opt-in registry decoder covers the ~33 names IPFP can't reach. crates.io 0.1.2; license MIT OR Apache-2.0; docs https://docs.rs/winarm-cpufeatures; source https://github.com/imazen/winarm-cpufeatures
+- [enough](https://raw.githubusercontent.com/imazen/enough/main/crates/enough/README.md): Minimal cooperative cancellation trait for long-running operations. crates.io 0.4.5; license MIT OR Apache-2.0; docs https://docs.rs/enough; source https://github.com/imazen/enough
+- [how-far](https://raw.githubusercontent.com/imazen/how-far/main/crates/how-far/README.md): Cancellation, progress, and weighted phases through one interface for library authors. crates.io 0.1.0; license MIT OR Apache-2.0; docs https://docs.rs/how-far; source https://github.com/imazen/how-far
+- [whereat](https://raw.githubusercontent.com/lilith/whereat/main/README.md): Lightweight error location tracking with small sizeof and no_std support. crates.io 0.1.5; license MIT OR Apache-2.0; docs https://docs.rs/whereat; source https://github.com/lilith/whereat
+- [zenbench](https://raw.githubusercontent.com/imazen/zenbench/main/README.md): Interleaved microbenchmarking with paired statistics, CI regression testing, and hardware-adaptive measurement. crates.io 0.1.11; license MIT OR Apache-2.0; docs https://docs.rs/zenbench; source https://github.com/imazen/zenbench
+
+## Optional
+
+- [IMI](https://gigapixels.imazen.org/): Earth and deep-space imagery in IMI, Imazen's own image format for fast, independently addressable decoding. The format is not frozen yet.
+- [JPEG AI in the browser](https://jpegai.imazen.org/): zenjpegai, the JPEG AI codec, running in the browser.
+- [Metrics](https://metrics.imazen.org/): Compare images under the metrics in zenmetrics.
+- [Metric cost](https://metric-brief.imazen.org/#models): What each of the ported image-quality metrics costs to run.
+- [squintly](https://squintly.imazen.org/): Pairwise psychovisual data collection for zensim.
+- [archmage docs](https://imazen.github.io/archmage/): Safe SIMD through capability tokens.
+- [Research dashboard](https://stats.lilith.now/): the year's work, adoption and measurements, live.
+- [codec-corpus](https://raw.githubusercontent.com/imazen/codec-corpus/main/crate/README.md): Runtime API for downloading, caching, and accessing test image datasets from imazen/codec-corpus and third-party sources. crates.io 1.1.0; license Apache-2.0; docs https://docs.rs/codec-corpus; source https://github.com/imazen/codec-corpus (Test corpora)
+- [imazen-26](https://raw.githubusercontent.com/imazen/imazen-26/main/README.md): The imazen-26 image corpus: provenance manifests, canonical train/validate/test split, variant-set registry, and generation tooling. Image bytes served from public R2. source on GitHub; license not declared; source https://github.com/imazen/imazen-26 (Test corpora)
+- [imazen-26-jxl-p3](https://raw.githubusercontent.com/imazen/imazen-26-jxl-p3/main/README.md): Imazen-26 image corpus: jxl-p3. release v2026.10.20 (2026-10-20); license not declared; source https://github.com/imazen/imazen-26-jxl-p3 (Test corpora)
+- [imazen-26-jxl-srgb](https://raw.githubusercontent.com/imazen/imazen-26-jxl-srgb/main/README.md): Imazen-26 image corpus: jxl-srgb. release v2026.10.19 (2026-10-20); license not declared; source https://github.com/imazen/imazen-26-jxl-srgb (Test corpora)
+- [imazen-26-originals](https://raw.githubusercontent.com/imazen/imazen-26-originals/main/README.md): Imazen-26 image corpus: originals. release v2026.10.19 (2026-10-20); license not declared; source https://github.com/imazen/imazen-26-originals (Test corpora)
+- [imazen-xl-26](https://raw.githubusercontent.com/imazen/imazen-xl-26/main/README.md): Imazen-26 image corpus: xl. release v2026.10.19 (2026-10-20); license not declared; source https://github.com/imazen/imazen-xl-26 (Test corpora)
+- [all-the-images](https://raw.githubusercontent.com/imazen/all-the-images/main/README.md): Reproducible multi-codec test corpus for zen image codecs. source on GitHub; license MIT; source https://github.com/imazen/all-the-images (Test corpora)
+- [zentrain-corpus](https://raw.githubusercontent.com/imazen/zentrain-corpus/main/README.md): Frozen training corpus for the zen codec MLP/picker stack. 713 train + 101 held-out validation images across 11 groups (CC-BY-SA 4.0 / Unsplash / CC0 / Pixabay). source on GitHub; license custom (see the repository); source https://github.com/imazen/zentrain-corpus (Test corpora)
+- [cargo-copter](https://raw.githubusercontent.com/imazen/cargo-copter/main/README.md): Test dependents against multiple versions of your crate (or your local WIP before publishing). Inspired by the cargo-crusader. crates.io 0.3.0; license MIT/Apache-2.0; docs https://docs.rs/cargo-copter; source https://github.com/imazen/cargo-copter (Developer tools)
+- [cargo-read](https://raw.githubusercontent.com/imazen/cargo-read/master/README.md): Download crate source and show README + metadata, designed for LLM tool use. crates.io 0.1.0; license MIT; docs https://docs.rs/cargo-read; source https://github.com/imazen/cargo-read (Developer tools)
+- [crate-mcp](https://github.com/imazen/crate-mcp): MCP server for Rust crate lookups, docs, and local dependency tracking. unreleased (source on GitHub); license not declared; source https://github.com/imazen/crate-mcp (Developer tools)
+- [cargo-superwork](https://github.com/imazen/cargo-superwork): Multi-repo Rust workspace manager — CI prep, dependency graphs, coordinated releases. unreleased (source on GitHub); license MIT; source https://github.com/imazen/cargo-superwork (Developer tools)
+- [zenutils](https://raw.githubusercontent.com/imazen/zenutils/main/README.md): Public-API snapshot test helper: workspace-wide committed API-surface docs with taxonomy summaries and feature-delta sections. release zenutils-apidoc-v0.1.1 (2026-06-11); license Apache-2.0; source https://github.com/imazen/zenutils (Developer tools)
+- [efficient-ui](https://github.com/imazen/efficient-ui): Zero-dependency UI components: image-compare web component, bench-chart SVG crate. source on GitHub; license not declared; source https://github.com/imazen/efficient-ui (Developer tools)
+- [astro-broken-link-checker](https://raw.githubusercontent.com/imazen/astro-broken-link-checker/main/README.md): . release v1.1.0 (2026-04-07); license Apache-2.0; source https://github.com/imazen/astro-broken-link-checker (Other tools)
+- [folioxml](https://raw.githubusercontent.com/imazen/folioxml/master/readme.md): Folio Flat File to XML/HTML/Lucene conversion framework. source on GitHub; license Apache-2.0; source https://github.com/imazen/folioxml (Other tools)
+- [interleaved-site](https://github.com/imazen/interleaved-site): Interleaved.org — landing page built with Interleaved's own Handlebars renderer. source on GitHub; license not declared; source https://github.com/imazen/interleaved-site (Other tools)
+- [imageci](https://raw.githubusercontent.com/imazen/imageci/master/README.md): Collaborative test suite & CI system focused for apps that produce images and text. Expects dockerized apps. source on GitHub; license AGPL-3.0; source https://github.com/imazen/imageci (Earlier work)
+- [imageflow-web](https://raw.githubusercontent.com/imazen/imageflow-web/gh-pages/README.md): Jekyll site for imageflow.io. source on GitHub; license custom (see the repository); source https://github.com/imazen/imageflow-web (Earlier work)
+- [srcset-checker](https://raw.githubusercontent.com/imazen/srcset-checker/main/README.md): Tests webpages and sites with different viewport sizes to reverse-engineer reflow and breakpoints and suggest precise srcset/picture markup. source on GitHub; license Apache-2.0; source https://github.com/imazen/srcset-checker (Earlier work)
+- [imageflow-now](https://raw.githubusercontent.com/lilith/imageflow-now/master/README.md): Imageflow on Vercel Now (serverless function). source on GitHub; license not declared; source https://github.com/lilith/imageflow-now (Earlier work)
+- [bank-csv](https://raw.githubusercontent.com/imazen/bank-csv/main/README.md): Proposed standard for CSV transaction exports from banks for card, checking, savings, merchant, and other financial accounts. source on GitHub; license not declared; source https://github.com/imazen/bank-csv (Earlier work)
+- [hardwired](https://raw.githubusercontent.com/imazen/hardwired/master/readme.md): Hardwired - A 'NonCMS' for coders that applies the DRY and KISS principles to both content and code. source on GitHub; license custom (see the repository); source https://github.com/imazen/hardwired (Earlier work)
+- [keyhub](https://raw.githubusercontent.com/imazen/keyhub/master/readme.md): License management portal from Imazen & Lucrasoft. Looking for new maintainer (has been replaced by Chargebee, S3, & a ruby script). source on GitHub; license custom (see the repository); source https://github.com/imazen/keyhub (Earlier work)
+- [repositext](https://raw.githubusercontent.com/imazen/repositext/master/README.md): . source on GitHub; license MIT; source https://github.com/imazen/repositext (Earlier work)
+- [suspension](https://raw.githubusercontent.com/imazen/suspension/master/README.md): Enables cross-format merging through token suspension. source on GitHub; license MIT; source https://github.com/imazen/suspension (Earlier work)
+- [load_image](https://raw.githubusercontent.com/lilith/load_image/rgb-prelude-export/README.md): Load PNG or JPEG with color profile support. unreleased (source on GitHub); license BSD-3-Clause; source https://github.com/lilith/load_image (Earlier work)
+
+Generated 2026-10-28 (inventory) and 2026-11-10 (registries) by https://github.com/imazen/imazen.
